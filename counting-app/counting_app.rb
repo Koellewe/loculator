@@ -25,8 +25,10 @@ def main
   Dir.mktmpdir 'loc' do |ws|
     Dir.chdir(ws)
     # clone remote repo
-    cmd_output = `GIT_SSH_COMMAND='ssh -i #{cfg['private_key']} -o IdentitiesOnly=yes'
-                    #{cfg['git']} clone #{vcs_url} ./ 2>&1 `
+    # setup command
+    cmd = "GIT_SSH_COMMAND='ssh -i #{cfg['private_key']} -o IdentitiesOnly=yes -o StrictHostKeyChecking=no' " \
+        "#{cfg['git']} clone #{vcs_url} ./ 2>&1"
+    cmd_output = `#{cmd}` # hectic backticks
 
     if cmd_output.include? 'not accessible: No such file or directory'
       $final_out['error'] = 'Could not read private key: ' + cfg['private_key']
