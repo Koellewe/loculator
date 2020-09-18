@@ -2,8 +2,23 @@
 
 require 'rugged'
 require 'tmpdir'
+require 'json'
+
 
 def main
+  if (cfg_file = ENV['LOCULATOR_CONFIG'])
+    cfg = JSON.parse(File.read(cfg_file))
+    creds = Rugged::Credentials::SshKey.new({
+                                              username: 'git',
+                                              publickey: cfg['public_key'],
+                                              privatekey: cfg['private_key'],
+                                              passphrase: nil,
+                                            })
+  else
+    puts 'ENV var "LOCULATOR_CONFIG" not set.'
+    exit
+  end
+
   if ARGV.empty?
     puts 'Please provide the VCS url'
     exit
@@ -14,8 +29,12 @@ def main
   # setup working dir
   Dir.mktmpdir 'loc' do |ws|
 
+    puts 'cloning'
     # clone remote repo
-    Rugged::Repository.clone_at(vcs_url, ws)
+    Rugged::Repository.clone_at(vcs_url, ws, {
+                                  credentials: creds
+                                })
+    puts 'cloned.'
 
     puts lines_in_dir ws
   end
@@ -36,6 +55,7 @@ def lines_in_dir(dir)
           total_lines += 1
         end
       end
+      puts 'Processed: ' + full_file
     end
   end
 

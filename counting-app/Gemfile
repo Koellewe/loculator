@@ -4,4 +4,6 @@ source 'https://rubygems.org'
 
 ruby '2.7'
 
+# requires libssh2-1-dev, libgit2-dev, cmake, gmake
 gem 'rugged', git: 'https://github.com/libgit2/rugged.git', submodules: true
+# has hanging issues with ssh protocol

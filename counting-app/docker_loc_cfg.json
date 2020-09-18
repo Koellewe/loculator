@@ -1,0 +1,4 @@
+{
+  "public_key": "/mnt/creds/loculator_key.pub",
+  "private_key": "/mnt/creds/loculator_key"
+}
