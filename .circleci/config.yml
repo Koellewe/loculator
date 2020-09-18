@@ -2,19 +2,17 @@ version: 2.1
 
 jobs:
   build_deploy_counting_container_unstable:
+    machine: true  # docker enabled
     steps:
-      - setup_remote_docker:
-          docker_layer_caching: true
       - checkout  # get code
       - run: docker build -t $DOCKER_HUB_USERNAME/loculator:unstable ./
       - run: docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
       - run: docker push $DOCKER_HUB_USERNAME/loculator
 
-  build_deploy_counting_container_stable:
+  build_deploy_counting_container_stable:  # same as above, but with stable tags
+    machine: true
     steps:
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - checkout  # get code
+      - checkout
       - run: docker build -t $DOCKER_HUB_USERNAME/loculator:stable -t $DOCKER_HUB_USERNAME/loculator:latest ./
       - run: docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
       - run: docker push $DOCKER_HUB_USERNAME/loculator
