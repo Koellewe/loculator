@@ -1,0 +1,36 @@
+version: 2.1
+
+jobs:
+  build_deploy_counting_container_unstable:
+    docker:
+      - image: docker:19
+    steps:
+      - checkout  # get code
+      - run: docker build -t $DOCKER_HUB_USERNAME/loculator:unstable ./
+      - run: docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+      - run: docker push $DOCKER_HUB_USERNAME/loculator
+
+  build_deploy_counting_container_stable:
+    docker:
+      - image: docker:19
+    steps:
+      - checkout  # get code
+      - run: docker build -t $DOCKER_HUB_USERNAME/loculator:stable -t $DOCKER_HUB_USERNAME/loculator:latest ./
+      - run: docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+      - run: docker push $DOCKER_HUB_USERNAME/loculator
+
+workflows:
+  version: 2
+  standard:
+    jobs:
+      - build_deploy_counting_container_unstable:
+          filters:
+            branches:
+              ignore: master
+
+  master_workflow:
+    jobs:
+      - build_deploy_counting_container_stable:
+          filters:
+            branches:
+              only: master
