@@ -2,18 +2,18 @@ version: 2.1
 
 jobs:
   build_deploy_counting_container_unstable:
-    docker:
-      - image: docker:19
     steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
       - checkout  # get code
       - run: docker build -t $DOCKER_HUB_USERNAME/loculator:unstable ./
       - run: docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
       - run: docker push $DOCKER_HUB_USERNAME/loculator
 
   build_deploy_counting_container_stable:
-    docker:
-      - image: docker:19
     steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
       - checkout  # get code
       - run: docker build -t $DOCKER_HUB_USERNAME/loculator:stable -t $DOCKER_HUB_USERNAME/loculator:latest ./
       - run: docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
