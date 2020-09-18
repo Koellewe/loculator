@@ -1,0 +1,22 @@
+GIT
+  remote: https://github.com/libgit2/rugged.git
+  revision: d928ca68fe7659e6cf45fa62426038246340d89b
+  submodules: true
+  specs:
+    rugged (1.0.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rugged!
+
+RUBY VERSION
+   ruby 2.7.0p0
+
+BUNDLED WITH
+   2.1.4

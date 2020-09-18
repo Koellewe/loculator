@@ -1,2 +1,4 @@
-/counting-app/workspace/
 /.idea/
+/counting-app/vendor/
+/counting-app/.idea/
+
