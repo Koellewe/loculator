@@ -5,7 +5,7 @@ jobs:
     machine: true  # docker enabled
     steps:
       - checkout  # get code
-      - run: docker build -t $DOCKER_HUB_USERNAME/loculator:unstable ./
+      - run: docker build -t $DOCKER_HUB_USERNAME/loculator:unstable counting-app
       - run: docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
       - run: docker push $DOCKER_HUB_USERNAME/loculator
 
@@ -13,7 +13,7 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: docker build -t $DOCKER_HUB_USERNAME/loculator:stable -t $DOCKER_HUB_USERNAME/loculator:latest ./
+      - run: docker build -t $DOCKER_HUB_USERNAME/loculator:stable -t $DOCKER_HUB_USERNAME/loculator:latest counting-app
       - run: docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
       - run: docker push $DOCKER_HUB_USERNAME/loculator
 
