@@ -1,65 +1,82 @@
 # Main counting program
 
-require 'rugged'
 require 'tmpdir'
 require 'json'
 
+$final_out = {}
 
 def main
+
   if (cfg_file = ENV['LOCULATOR_CONFIG'])
     cfg = JSON.parse(File.read(cfg_file))
-    creds = Rugged::Credentials::SshKey.new({
-                                              username: 'git',
-                                              publickey: cfg['public_key'],
-                                              privatekey: cfg['private_key'],
-                                              passphrase: nil,
-                                            })
   else
-    puts 'ENV var "LOCULATOR_CONFIG" not set.'
-    exit
+    $final_out['error'] = 'ENV var "LOCULATOR_CONFIG" not set.'
+    complete_run 1
   end
 
   if ARGV.empty?
-    puts 'Please provide the VCS url'
-    exit
+    $final_out['error'] = 'VCS url not provided'
+    complete_run 1
   end
 
   vcs_url = ARGV[0]
 
   # setup working dir
   Dir.mktmpdir 'loc' do |ws|
-
-    puts 'cloning'
+    Dir.chdir(ws)
     # clone remote repo
-    Rugged::Repository.clone_at(vcs_url, ws, {
-                                  credentials: creds
-                                })
-    puts 'cloned.'
+    cmd_output = `GIT_SSH_COMMAND='ssh -i #{cfg['private_key']} -o IdentitiesOnly=yes'
+                    #{cfg['git']} clone #{vcs_url} ./ 2>&1 `
 
-    puts lines_in_dir ws
+    if cmd_output.include? 'not accessible: No such file or directory'
+      $final_out['error'] = 'Could not read private key: ' + cfg['private_key']
+      complete_run 1
+    elsif cmd_output.include? 'Permission denied (publickey)'
+      $final_out['error'] = 'Failed to authenticate. SSH key mismatch.'
+      complete_run 1
+    else
+      # setup output
+      $final_out['total_lines'] = 0
+      $final_out['blank_lines'] = 0
+      $final_out['total_files'] = 0
+      $final_out['non_text_files'] = 0
+
+      # do counting
+      lines_in_dir ws
+      complete_run 0
+    end
   end
 
 end
 
 # Do DFS line counting
 def lines_in_dir(dir)
-  total_lines = 0
 
+  # iterate through all items in dir
   Dir.open(dir).each_child do |filename|
     full_file = dir + '/' + filename
     if File.directory? full_file
-      total_lines += lines_in_dir(full_file) unless filename == '.git'  # ignore .git dir
+      lines_in_dir(full_file) unless filename == '.git' # ignore .git dir
     else
-      File.open(full_file) do |file|
-        file.each do
-          total_lines += 1
+      if `file -ib #{full_file}`.start_with? 'text' # text file
+        File.open(full_file) do |file|
+          file.each do |line|
+            $final_out['total_lines'] += 1
+            $final_out['blank_lines'] += 1 if line.strip.empty?
+          end
         end
+      else
+        $final_out['non_text_files'] +=1
       end
-      puts 'Processed: ' + full_file
+      $final_out['total_files'] += 1
     end
   end
 
-  total_lines
+end
+
+def complete_run(exit_code = 0)
+  puts $final_out.to_json
+  exit exit_code
 end
 
 main

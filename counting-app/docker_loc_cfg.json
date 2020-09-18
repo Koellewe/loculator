@@ -1,4 +1,4 @@
 {
-  "public_key": "/mnt/creds/loculator_key.pub",
-  "private_key": "/mnt/creds/loculator_key"
+  "private_key": "/mnt/creds/loculator_key",
+  "git": "/usr/bin/git"
 }
