@@ -17,6 +17,7 @@ For an example config file, see `docker_loc_cfg.json`, which is the default conf
 Since it has no dependencies, running is as simple as:
 
 ```shell script
+export LOCULATOR_CONFIG=/path/to/cfg.json
 ruby counting_app.rb [VCS_url]
 ```
 
@@ -31,3 +32,19 @@ For processing convenience, the program always outputs in JSON directly to STDOU
 ``` 
 
 If there's an error, the outputted json will have one key called `error` with value being a string description of what went wrong. Most likely this will be an SSH key mismatch.
+
+## Containerisation
+
+Build:
+
+```shell script
+docker build -t loculator ./
+```
+
+Run:
+
+```shell script
+docker run -e "VCS_URL=[the_url]" -v "/path/to/key:/mnt/creds" loculator
+```
+
+The json output will print directly to `stdout`.
