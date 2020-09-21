@@ -36,6 +36,9 @@ def main
     elsif cmd_output.include? 'Permission denied (publickey)'
       $final_out['error'] = 'Failed to authenticate. SSH key mismatch.'
       complete_run 1
+    elsif Dir.new(ws).children.reject { |name| name == '.git' }.empty?
+      $final_out['error'] = 'Cloning failed for unknown reasons.'
+      complete_run 1
     else
       # setup output
       $final_out['total_lines'] = 0

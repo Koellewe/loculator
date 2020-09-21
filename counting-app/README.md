@@ -44,7 +44,14 @@ docker build -t loculator ./
 Run:
 
 ```shell script
+# after local build:
 docker run -e "VCS_URL=[the_url]" -v "/path/to/key:/mnt/creds" loculator
+
+# from dockerhub:
+docker run -e "VCS_URL=[the_url]" -v "/path/to/key:/mnt/creds" koellewe/loculator:stable
 ```
 
 The json output will print directly to `stdout`.
+
+A list of all docker tags for `koellewe/loculator` is available on the [DockerHub page](https://hub.docker.com/repository/docker/koellewe/loculator).
+
