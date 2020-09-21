@@ -1,4 +1,7 @@
 {
   "ssh_key_path": "/path/to/key",
-  "host_domain": "https://example.org"
+  "host_domain": "https://example.org",
+  "db_usr": "user",
+  "db_pwd": "pass",
+  "db_name": "name"
 }

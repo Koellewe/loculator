@@ -1,5 +1,8 @@
 # Main counting program
 
+# TODO: create cloner script that clones a bare repo, and checks the logs, as a form of cache-checking
+# Note that this will have minimal speed advantages, and adds a tonne of complexity to the service
+
 require 'tmpdir'
 require 'json'
 
