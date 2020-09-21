@@ -27,7 +27,7 @@ def main
     # clone remote repo
     # setup command
     cmd = "GIT_SSH_COMMAND='ssh -i #{cfg['private_key']} -o IdentitiesOnly=yes -o StrictHostKeyChecking=no' " \
-        "#{cfg['git']} clone #{vcs_url} ./ 2>&1"
+        "#{cfg['git']} clone --depth 1 #{vcs_url} ./ 2>&1"
     cmd_output = `#{cmd}` # hectic backticks
 
     if cmd_output.include? 'not accessible: No such file or directory'

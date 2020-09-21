@@ -5,3 +5,11 @@ body {
     font-weight: bold;
     font-style: italic;
 }
+
+.url {
+    font-size: 1.3em;
+}
+
+.url-provider {
+    color: blue;
+}

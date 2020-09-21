@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   root 'pages#show_home'
 
   # loc: allow any chars for provider, except a slash
-  get '/api/loc/:provider/:user/:repo' => 'api#loc', :constraints => { provider: %r{[^/]+} }
+  get '/api/loc/:provider/:user/:repo' => 'api#loc_std', :constraints => { provider: %r{[^/]+} }
+  get '/api/loc' => 'api#loc_specified'
   get '/(*url)', to: 'pages#not_found'
 end

@@ -1,7 +1,8 @@
 class PagesController < ApplicationController
   def show_home
     @title = 'LoCulator'
-    render template: "pages/home"
+    @host = Rails.application.config.cfg['host_domain']
+    render template: 'pages/home'
   end
 
   def not_found
