@@ -1,11 +1,19 @@
-
+<div class="content">
 <h1>LoCulator</h1>
 <p class="subtitle">For all your LoC calculation needs!</p>
 
 <p>LoCulator is a free and open API that allows anyone to check the number of lines of code their git-based
 project has. </p>
+
+<!-- TODO: interactive demo, and move all this stuff to documentation page -->
+
+<!-- TODO: link github -->
+
 <h3>Public projects</h3>
-<code class="url">GET <%= @host %>/api/loc/github.com/Koellewe/stonks</code>
+<code class="url"><span class="url-method">GET</span>
+  <span class="url-domain"><%= @host %></span>/api/loc/<span class="url-provider">github.com</span>/
+  <span class="url-user unspace">Koellewe</span>/<span class="url-repo">stonks</span>
+</code>
 <p>Response:</p>
 <code><pre>
 {
@@ -35,7 +43,11 @@ to your VCS account. Help for GitHub, BitBucket, and GitLab.</p>
 
 <p>Then when you make a request, add the <strong>private</strong> parameter. This will force SSH.</p>
 
-<code class="url">GET <%= @host %>/api/loc/github.com/someone/somerepo?private=true</code>
+<code class="url"><span class="url-method">GET</span>
+  <span class="url-domain"><%= @host %></span>/api/loc/<span class="url-provider">github.com</span>/
+  <span class="url-user unspace">someone</span>/<span class="url-repo">somerepo</span>?
+  <span class="url-param unspace">private=true</span>
+</code>
 
 <h3>Caching</h3>
 
@@ -46,4 +58,10 @@ authorised API keys with requests. Somehow I doubt this will be very popular.</p
 <p>If you want to help out with caching in these cases, pass in the latest commit hash when calling the API.
 The service will take your word for it, and use it for internal caching, resulting in much faster calls:</p>
 
-<code class="url">GET <%= @host %>/api/loc/github.com/someone/somerepo?private=true&latest_commit=1709cf9e42d91bf14d958f8a4a4c7d24f2170e2c</code>
+<code class="url"><span class="url-method">GET</span>
+  <span class="url-domain"><%= @host %></span>/api/loc/<span class="url-provider">github.com</span>/
+  <span class="url-user unspace">someone</span>/<span class="url-repo">somerepo</span>?
+  <span class="url-param unspace">private=true</span>&
+  <span class="url-param unspace">latest_commit=1709cf9e42d91bf14d958f8a4a4c7d24f2170e2c</span>
+</code>
+</div>
