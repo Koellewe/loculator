@@ -31,6 +31,10 @@ jobs:
     steps:
       - checkout
       - run:
+          name: depends
+          command: |
+            apk add libxslt-dev libxml2-dev alpine-sdk patch ruby-dev
+      - run:
           name: bundle
           working_directory: web-server
           command: |
