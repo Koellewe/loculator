@@ -40,11 +40,12 @@ jobs:
           command: |
             bundle config set deployment 'true'
             bundle config set without 'development test'
+            bundle config set path 'vendor/bundle'
             bundle install
       - run:
           name: tar
           working_directory: web-server
-          command: tar -czf web-server.tar.gz *
+          command: tar -czf web-server.tar.gz $(ls -A)
       - persist_to_workspace:
           root: web-server
           paths:
