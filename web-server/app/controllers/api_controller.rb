@@ -1,5 +1,4 @@
 require 'docker'
-require_relative '../db'
 require 'net/http'
 require 'uri'
 require 'json'
@@ -91,32 +90,32 @@ class ApiController < ApplicationController
       return unless @sha
     end
 
-    @db = connect_db
-    stmt = @db.prepare('SELECT latest_commit, json_cache FROM loc_cache WHERE vcs_url = ?')
-    row = stmt.execute(@vcs_url).first
-
+    row = LocCache.find_by(vcs_url: @vcs_url)
     if row
-      @cached = true
       lc = row['latest_commit']
-      row['json_cache'] if lc == @sha
+      if lc == @sha
+        row['json_cache']
+      else
+        @cache_op = :update
+        nil # blank return means cache miss
+      end
     else
-      @cached = false
+      @cache_op = :create
+      nil
     end
 
   end
 
   # do the actual caching, if necessary
   private def finalise_cache
-    return unless @db # will only be defined if something worth caching
-
-    if @cached
-      stmt = @db.prepare('UPDATE loc_cache SET latest_commit = ?, json_cache = ? WHERE vcs_url = ?')
-      stmt.execute(@sha, @results.to_json, @vcs_url)
-    else
-      stmt = @db.prepare('INSERT INTO loc_cache(vcs_url, latest_commit, json_cache) VALUE (?, ?, ?)')
-      stmt.execute(@vcs_url, @sha, @results.to_json)
+    if @cache_op == :update
+      cache = LocCache.find_by(vcs_url: @vcs_url)
+      cache['latest_commit'] = @sha
+      cache['json_cache'] = @results.to_json
+      cache.save!
+    elsif @cache_op == :create
+      LocCache.create(vcs_url: @vcs_url, latest_commit: @sha, json_cache: @results.to_json)
     end
-    @db.close
   end
 
   # get the VCS provider, owner, and repo from a url. Note only works for the big boy providers

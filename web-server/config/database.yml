@@ -1,0 +1,9 @@
+default: &default
+  adapter: mysql2
+  username: <%= Rails.application.config.cfg['db_usr'] %>
+  password: <%= Rails.application.config.cfg['db_pwd'] %>
+  database: <%= Rails.application.config.cfg['db_name'] %>
+
+development: *default
+testing: *default
+production: *default
