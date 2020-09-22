@@ -27,7 +27,7 @@ jobs:
 
   build_web:
     docker:
-      image: ruby:2.7-alpine
+      - image: ruby:2.7-alpine
     steps:
       - checkout
       - run:
