@@ -33,7 +33,7 @@ jobs:
       - run:
           name: depends
           command: |
-            apk add libxslt-dev libxml2-dev alpine-sdk patch ruby-dev
+            apk add libxslt-dev libxml2-dev alpine-sdk patch ruby-dev mariadb-dev
       - run:
           name: bundle
           working_directory: web-server
