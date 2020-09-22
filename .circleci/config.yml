@@ -38,9 +38,9 @@ jobs:
           name: bundle
           working_directory: web-server
           command: |
-            bundle config set deployment 'true'
-            bundle config set without 'development test'
-            bundle config set path 'vendor/bundle'
+            bundle config set --local deployment 'true'
+            bundle config set --local without 'development test'
+            bundle config set --local path 'vendor/bundle'
             bundle install
       - run:
           name: tar
