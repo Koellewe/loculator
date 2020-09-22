@@ -58,7 +58,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "fa:78:a9:56:93:d7:8a:d7:65:d7:1e:db:41:38:74:70"
-      - run: scp web-server/web-server.tar.gz ci@$PROD_HOST:./deploy-scripts/loculator/
+      - run: scp web-server.tar.gz ci@$PROD_HOST:./deploy-scripts/loculator/
       - run: ssh ci@$PROD_HOST "sudo deploy-scripts/loculator/deploy_web.sh"
 
 workflows:
