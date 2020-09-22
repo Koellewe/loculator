@@ -17,6 +17,46 @@ jobs:
       - run: docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
       - run: docker push $DOCKER_HUB_USERNAME/loculator
 
+  deploy_container:
+    machine: true
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "fa:78:a9:56:93:d7:8a:d7:65:d7:1e:db:41:38:74:70"
+      - run: ssh ci@$PROD_HOST "docker pull $DOCKER_HUB_USERNAME/loculator:stable"
+
+  build_web:
+    docker:
+      image: ruby:2.7-alpine
+    steps:
+      - checkout
+      - run:
+          name: bundle
+          working_directory: web-server
+          command: |
+            bundle config set deployment 'true'
+            bundle config set without 'development test'
+            bundle install
+      - run:
+          name: tar
+          working_directory: web-server
+          command: tar -czf web-server.tar.gz *
+      - persist_to_workspace:
+          root: web-server
+          paths:
+            - web-server.tar.gz
+
+  deploy_web:
+    machine: true
+    steps:
+      - attach_workspace:
+          at: ./
+      - add_ssh_keys:
+          fingerprints:
+            - "fa:78:a9:56:93:d7:8a:d7:65:d7:1e:db:41:38:74:70"
+      - run: scp web-server/web-server.tar.gz ci@$PROD_HOST:./deploy-scripts/loculator/
+      - run: ssh ci@$PROD_HOST "sudo deploy-scripts/loculator/deploy_web.sh"
+
 workflows:
   version: 2
   standard:
@@ -32,3 +72,18 @@ workflows:
           filters:
             branches:
               only: master
+      - build_web:
+          filters:
+            branches:
+              only: master
+      - deployment_approval:
+          type: approval
+          requires:
+            - build_deploy_counting_container_stable
+            - build_web
+      - deploy_container:
+          requires:
+            - deployment_approval
+      - deploy_web:
+          requires:
+            - deployment_approval
