@@ -1,5 +1,5 @@
 <div class="content">
-  <%= render '/layouts/title' do %>LoCulator Documentation<% end %>
+  <%= render '/layouts/title' do %><%= @title %><% end %>
   <p class="subtitle">Short and sweet - I promise!</p>
 
   <h3>Public projects</h3>
@@ -59,3 +59,5 @@
     <span class="url-param unspace">latest_commit=1709cf9e42d91bf14d958f8a4a4c7d24f2170e2c</span>
   </code>
 </div>
+
+<%= render 'layouts/footer' %>

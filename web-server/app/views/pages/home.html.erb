@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="css/spinner.css">
 
 <div class="content">
-<%= render '/layouts/title' do %>LoCulator<% end %>
+<%= render '/layouts/title' do %><%= @title %><% end %>
 
 <p>LoCulator is a free and open API that allows anyone to check the number of lines of code their git-based
   project has. Works for <strong>any public git repo on GitHub, BitBucket, and GitLab</strong>. (See
@@ -13,9 +13,9 @@
       <code class="url" style="min-width: max-content;"><span class="url-method">GET</span>
         <span id="demo-url-base"><%= @host %>/api/loc/</span>
       </code>
-      <div style="width: 100%; display: flex; margin-top: -6px;">
+      <div style="width: 100%; display: flex; margin-top: -8px;">
         <input type="text" id="demo-url" value="github.com/Koellewe/loculator">
-        <button onclick="onDemoClick()" id=demo-btn>Fetch</button>
+        <button onclick="onDemoClick()" id="demo-btn"><img src="icons/run.svg" width="20"></button>
       </div>
     </div>
     <div class="muted" style="margin-top: 18px;">Result</div>
@@ -26,12 +26,18 @@
   </div>
 
 <div style="display: flex; margin: 48px auto 12px; width: max-content">
-  <button onclick="window.location.href = '/documentation'">Documentation &gt;</button>
+  <button onclick="window.location.href = 'https://github.com/Koellewe/loculator'" style="display: flex;">
+    <img src="https://libalex.singularity.net.za/rauten/icons/github.svg" width="36">
+    <p style="padding-left: 8px;">GitHub Repo</p></button>
+  <div style="width: 24px;"></div>
+  <button onclick="window.location.href = '/documentation'" style="display: flex;">
+    <img src="icons/docs.svg" width="36">
+    <p style="padding-left: 8px;">Documentation</p></button>
 </div>
 
-<!-- TODO: link github -->
-
 </div>
+
+<%= render 'layouts/footer'%>
 
 <script>
   async function onDemoClick(){

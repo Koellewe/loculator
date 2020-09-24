@@ -14,6 +14,11 @@ class PagesController < ApplicationController
     render template: 'pages/docs'
   end
 
+  def legal
+    @title = 'LoCulator Legal'
+    render template: 'pages/legal'
+  end
+
   def not_found
     render file: 'public/404.html', status: :not_found
   end
