@@ -21,7 +21,7 @@
     <div class="muted" style="margin-top: 18px;">Result</div>
     <div style="position: relative">
       <div class="lds-default" id="demo-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-      <textarea id="demo-json" rows="10" readonly></textarea>
+      <pre id="demo-json-pre"><code class="lang-json" id="demo-json"></code></pre>
     </div>
   </div>
 
@@ -42,15 +42,16 @@
 <script>
   async function onDemoClick(){
       demoJson = document.getElementById('demo-json');
-      demoJson.value = 'Running request...';
+      demoJson.innerText = 'Running request...';
 
       spinner = document.getElementById('demo-spinner');
       spinner.style['display'] = 'block';
 
       base = document.getElementById('demo-url-base').innerText;
       res = await fetch(base + document.getElementById('demo-url').value);
-      demoJson.value =
+      demoJson.innerText =
           JSON.stringify(await res.json(), null, 2);
+      hljs.highlightBlock(demoJson);
 
       spinner.style['display'] = 'none';
   }
