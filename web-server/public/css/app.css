@@ -11,6 +11,13 @@ body {
     transition: 0.3s;
 }
 
+.card {
+    /* card effects */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    padding: 12px 24px;
+}
+
 .subtitle {
     font-weight: bold;
     font-style: italic;
@@ -40,4 +47,28 @@ body {
 }
 .unspace {
     margin-left: -10px;
+}
+
+#demo-url {
+    font-family: monospace;
+    width: 100%;
+}
+#demo-btn {
+    float: right;
+    margin-left: 8px;
+}
+#demo-json {
+    font-family: monospace;
+    width: 100%;
+}
+
+.muted {
+    font-size: 0.8em;
+    color: darkgray;
+}
+
+#demo-spinner {
+    display: none;
+    position: absolute;
+    margin: 30px 12px;
 }

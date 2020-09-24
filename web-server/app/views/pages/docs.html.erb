@@ -1,0 +1,61 @@
+<div class="content">
+  <%= render '/layouts/title' do %>LoCulator Documentation<% end %>
+  <p class="subtitle">Short and sweet - I promise!</p>
+
+  <h3>Public projects</h3>
+  <code class="url"><span class="url-method">GET</span>
+    <span class="url-domain"><%= @host %></span>/api/loc/<span class="url-provider">github.com</span>/
+    <span class="url-user unspace">Koellewe</span>/<span class="url-repo">stonks</span>
+  </code>
+  <p>Response:</p>
+  <code><pre>
+{
+    "vcs_url": "https://github.com/Koellewe/stonks",
+    "results":
+    {
+        "total_lines": 249,
+        "blank_lines": 58,
+        "total_files": 6,
+        "non_text_files": 0
+    }
+}
+</pre></code>
+
+  <p>The API also works with Bitbucket, Gitlab, and custom git providers (like self-hosted Gitlab).
+    Simply replace <strong class="url-provider">github.com</strong> in the URL with your provider's domain.</p>
+
+  <h3>Private projects</h3>
+
+  <p>To allow LoCulator to clone private repos, you should add its public SSH key with read-only permissions
+    to your VCS account. Guides to do this:
+    <a href="https://docs.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account">GitHub</a>,
+    <a href="https://support.atlassian.com/bitbucket-cloud/docs/set-up-an-ssh-key/">BitBucket</a>, and
+    <a href="https://docs.gitlab.com/ee/ssh/#adding-an-ssh-key-to-your-gitlab-account">GitLab</a>.</p>
+
+  <textarea readonly style="width: 100%; height: 84px;"><%= @public_key %>
+  </textarea>
+
+  <p>Then when you make a request, add the <strong class="url-param">private</strong> parameter. This will force SSH.</p>
+
+  <code class="url"><span class="url-method">GET</span>
+    <span class="url-domain"><%= @host %></span>/api/loc/<span class="url-provider">github.com</span>/
+    <span class="url-user unspace">someone</span>/<span class="url-repo">somerepo</span>?
+    <span class="url-param unspace">private=true</span>
+  </code>
+
+  <h3>Caching</h3>
+
+  <p>The service does do internal caching for public projects hosted on one of the big three
+    providers named above (because they have easy API's for checking the latest commit hashes remotely).
+    <br/>However, this can't really work for private repos unless users are willing to pass in
+    authorised API keys with requests. Somehow I doubt this will be very popular.</p>
+  <p>If you want to help out with caching in these cases, pass in the latest commit hash when calling the API.
+    The service will take your word for it, and use it for internal caching, resulting in much faster calls:</p>
+
+  <code class="url"><span class="url-method">GET</span>
+    <span class="url-domain"><%= @host %></span>/api/loc/<span class="url-provider">github.com</span>/
+    <span class="url-user unspace">someone</span>/<span class="url-repo">somerepo</span>?
+    <span class="url-param unspace">private=true</span>&
+    <span class="url-param unspace">latest_commit=1709cf9e42d91bf14d958f8a4a4c7d24f2170e2c</span>
+  </code>
+</div>

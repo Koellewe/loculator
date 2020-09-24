@@ -1,67 +1,51 @@
+<link rel="stylesheet" href="css/spinner.css">
+
 <div class="content">
-<h1>LoCulator</h1>
-<p class="subtitle">For all your LoC calculation needs!</p>
+<%= render '/layouts/title' do %>LoCulator<% end %>
 
 <p>LoCulator is a free and open API that allows anyone to check the number of lines of code their git-based
-project has. </p>
+  project has. Works for <strong>any public git repo on GitHub, BitBucket, and GitLab</strong>. (See
+  <a href="/documentation">documentation</a> on private repos and special VCS providers.)</p>
 
-<!-- TODO: interactive demo, and move all this stuff to documentation page -->
+  <div class="card">
+    <h4>Try it out</h4>
+    <div style="display: flex">
+      <code class="url" style="min-width: max-content;"><span class="url-method">GET</span>
+        <span id="demo-url-base"><%= @host %>/api/loc/</span>
+      </code>
+      <div style="width: 100%; display: flex; margin-top: -6px;">
+        <input type="text" id="demo-url" value="github.com/Koellewe/loculator">
+        <button onclick="onDemoClick()" id=demo-btn>Fetch</button>
+      </div>
+    </div>
+    <div class="muted" style="margin-top: 18px;">Result</div>
+    <div style="position: relative">
+      <div class="lds-default" id="demo-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      <textarea id="demo-json" rows="10" readonly></textarea>
+    </div>
+  </div>
+
+<div style="display: flex; margin: 48px auto 12px; width: max-content">
+  <button onclick="window.location.href = '/documentation'">Documentation &gt;</button>
+</div>
 
 <!-- TODO: link github -->
 
-<h3>Public projects</h3>
-<code class="url"><span class="url-method">GET</span>
-  <span class="url-domain"><%= @host %></span>/api/loc/<span class="url-provider">github.com</span>/
-  <span class="url-user unspace">Koellewe</span>/<span class="url-repo">stonks</span>
-</code>
-<p>Response:</p>
-<code><pre>
-{
-    "vcs_url": "https://github.com/Koellewe/stonks",
-    "results":
-    {
-        "total_lines": 249,
-        "blank_lines": 58,
-        "total_files": 6,
-        "non_text_files": 0
-    }
-}
-</pre></code>
-
-<p>The API also works with Bitbucket, Gitlab, and custom git providers (like self-hosted Gitlab).
-Simply replace <strong class="url-provider">github.com</strong> in the URL with your provider's domain.</p>
-
-<h3>Private projects</h3>
-
-<p>To allow LoCulator to clone private repos, you should add its public SSH key with read-only permissions
-to your VCS account. Help for GitHub, BitBucket, and GitLab.</p>
-
-<code>
-<!-- todo public key -->
-  //todo
-</code>
-
-<p>Then when you make a request, add the <strong>private</strong> parameter. This will force SSH.</p>
-
-<code class="url"><span class="url-method">GET</span>
-  <span class="url-domain"><%= @host %></span>/api/loc/<span class="url-provider">github.com</span>/
-  <span class="url-user unspace">someone</span>/<span class="url-repo">somerepo</span>?
-  <span class="url-param unspace">private=true</span>
-</code>
-
-<h3>Caching</h3>
-
-<p>The service does do internal caching for public projects hosted on one of the big three
-providers named above (because they have easy API's for checking the latest commit hashes remotely).
-  <br/>However, this can't really work for private repos unless users are willing to pass in
-authorised API keys with requests. Somehow I doubt this will be very popular.</p>
-<p>If you want to help out with caching in these cases, pass in the latest commit hash when calling the API.
-The service will take your word for it, and use it for internal caching, resulting in much faster calls:</p>
-
-<code class="url"><span class="url-method">GET</span>
-  <span class="url-domain"><%= @host %></span>/api/loc/<span class="url-provider">github.com</span>/
-  <span class="url-user unspace">someone</span>/<span class="url-repo">somerepo</span>?
-  <span class="url-param unspace">private=true</span>&
-  <span class="url-param unspace">latest_commit=1709cf9e42d91bf14d958f8a4a4c7d24f2170e2c</span>
-</code>
 </div>
+
+<script>
+  async function onDemoClick(){
+      demoJson = document.getElementById('demo-json');
+      demoJson.value = 'Running request...';
+
+      spinner = document.getElementById('demo-spinner');
+      spinner.style['display'] = 'block';
+
+      base = document.getElementById('demo-url-base').innerText;
+      res = await fetch(base + document.getElementById('demo-url').value);
+      demoJson.value =
+          JSON.stringify(await res.json(), null, 2);
+
+      spinner.style['display'] = 'none';
+  }
+</script>

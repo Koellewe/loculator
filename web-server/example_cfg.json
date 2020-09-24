@@ -3,5 +3,6 @@
   "host_domain": "https://example.org",
   "db_usr": "user",
   "db_pwd": "pass",
-  "db_name": "name"
+  "db_name": "name",
+  "ssh_key_name": "id_rsa"
 }
