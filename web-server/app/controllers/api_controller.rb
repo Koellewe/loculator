@@ -28,9 +28,11 @@ class ApiController < ApplicationController
 
   private def loc_impl
     # todo rate limiting
-    # todo caching (public only)
-    # todo vcs_url parameter
-    # todo increase timeout
+    # todo implement request accepting and async checking
+    # immediately return HTTP_ACCEPTED and a null cache
+    # next request same
+    # then when done next request will return HTTP_OK with cache
+    # require that private repos also send latest commit hash
 
     json_cache = init_cache
     if json_cache
@@ -53,7 +55,13 @@ class ApiController < ApplicationController
     res = counter.tap(&:start).attach(stdin: nil)
 
     begin
-      counting_output = JSON.parse(res[0][0])
+      txt = res[0][0]
+      counting_output = if txt.nil?
+        { 'error': 'Could not parse response from container' }
+      else
+        JSON.parse(txt)
+      end
+
       if counting_output['error']
         @error = counting_output['error']
       else
@@ -86,8 +94,8 @@ class ApiController < ApplicationController
           res = Net::HTTP.get URI("https://gitlab.com/api/v4/projects/#{owner}%2F#{repo}/repository/commits")
           @sha = JSON.parse(res)[0]['id']
         end
-      rescue JSON::ParserError, NoMethodError
-        return # probably 404
+      rescue JSON::ParserError, NoMethodError, Net::OpenTimeout, Net::TimeOutError
+        return # either 404 or flaky VCS API
       end
       return unless @sha
     end

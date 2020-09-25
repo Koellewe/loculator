@@ -40,22 +40,38 @@
 <%= render 'layouts/footer'%>
 
 <script>
-  async function onDemoClick(){
-      demoJson = document.getElementById('demo-json');
-      demoJson.innerText = 'Running request...';
+  // global
+  const demoJson = document.getElementById('demo-json');
+  const spinner = document.getElementById('demo-spinner');
 
-      spinner = document.getElementById('demo-spinner');
+  function demoOut(obj){
+      demoJson.innerText = JSON.stringify(obj, null, 2);
+      hljs.highlightBlock(demoJson);
+      spinner.style['display'] = 'none';
+  }
+
+  function onDemoClick(){
+      demoJson.innerText = 'Running request...';
       spinner.style['display'] = 'block';
 
-      base = document.getElementById('demo-url-base').innerText;
-      fetch(base + document.getElementById('demo-url').value).then(res => res.json())
-        .then(res => {
-            demoJson.innerText = JSON.stringify(res, null, 2);
-        }).catch(err => {
-            demoJson.innerText = JSON.stringify({'error': err}, null, 2);
-        }).then(() => {
-            hljs.highlightBlock(demoJson);
-            spinner.style['display'] = 'none';
-        });
+      const base = document.getElementById('demo-url-base').innerText;
+      const url = base + document.getElementById('demo-url').value;
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url);
+      xhr.responseType = 'json';
+      xhr.timeout = 300 * 1000; // 5 mins
+      xhr.onload = function() {
+          if (xhr.status === 200){
+              demoOut(xhr.response)
+          }else{
+              demoOut({'error': 'Unexpected response: '+xhr.status})
+          }
+      }
+      xhr.onerror = function() {
+          demoOut({'error': xhr.responseText || 'Error completing the request.'})
+      }
+
+      xhr.send();
   }
 </script>
