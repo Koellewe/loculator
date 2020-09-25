@@ -39,8 +39,10 @@ class ApiController < ApplicationController
       return
     end
 
-    tag = Rails.env == 'production' ? 'stable' : 'stable'
+    tag = Rails.env == 'production' ? 'stable' : 'unstable'
     ssh_path = Rails.application.config.cfg['ssh_key_path']
+
+    Docker.options[:read_timeout] = 300 # 5 mins
 
     # res = `docker run -e "VCS_URL=#{vcs_url}" -v "#{config.cfg['ssh_key_path']}:/mnt/creds" koellewe/loculator:#{tag}`
     counter = Docker::Container.create('Image' => "koellewe/loculator:#{tag}",

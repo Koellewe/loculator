@@ -48,11 +48,14 @@
       spinner.style['display'] = 'block';
 
       base = document.getElementById('demo-url-base').innerText;
-      res = await fetch(base + document.getElementById('demo-url').value);
-      demoJson.innerText =
-          JSON.stringify(await res.json(), null, 2);
-      hljs.highlightBlock(demoJson);
-
-      spinner.style['display'] = 'none';
+      fetch(base + document.getElementById('demo-url').value).then(res => res.json())
+        .then(res => {
+            demoJson.innerText = JSON.stringify(res, null, 2);
+        }).catch(err => {
+            demoJson.innerText = JSON.stringify({'error': err}, null, 2);
+        }).then(() => {
+            hljs.highlightBlock(demoJson);
+            spinner.style['display'] = 'none';
+        });
   }
 </script>
