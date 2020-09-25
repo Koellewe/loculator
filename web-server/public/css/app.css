@@ -73,3 +73,7 @@ body {
     position: absolute;
     margin: 30px 12px;
 }
+
+#demo-status {
+    font-weight: bold;
+}

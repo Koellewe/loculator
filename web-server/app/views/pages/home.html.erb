@@ -18,7 +18,11 @@
         <button onclick="onDemoClick()" id="demo-btn"><img src="icons/run.svg" width="20"></button>
       </div>
     </div>
-    <div class="muted" style="margin-top: 18px;">Result</div>
+    <div style="display: flex; margin-top: 18px;">
+      <div class="muted">Result</div>
+      <div style="flex-grow: 1"></div>
+      <div id="demo-status"></div>
+    </div>
     <div style="position: relative">
       <div class="lds-default" id="demo-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       <pre id="demo-json-pre"><code class="lang-json" id="demo-json"></code></pre>
@@ -43,15 +47,21 @@
   // global
   const demoJson = document.getElementById('demo-json');
   const spinner = document.getElementById('demo-spinner');
+  const demoStatus = document.getElementById('demo-status');
 
-  function demoOut(obj){
+  function demoOut(obj, xhr){
       demoJson.innerText = JSON.stringify(obj, null, 2);
       hljs.highlightBlock(demoJson);
+
+      if (xhr.status > 0)
+        demoStatus.innerText = xhr.status + ' ' + xhr.statusText
+
       spinner.style['display'] = 'none';
   }
 
   function onDemoClick(){
       demoJson.innerText = 'Running request...';
+      demoStatus.innerText = '';
       spinner.style['display'] = 'block';
 
       const base = document.getElementById('demo-url-base').innerText;
@@ -62,14 +72,15 @@
       xhr.responseType = 'json';
       xhr.timeout = 300 * 1000; // 5 mins
       xhr.onload = function() {
-          if (xhr.status === 200){
-              demoOut(xhr.response)
+          const sNum = Math.floor(xhr.status / 100)
+          if (sNum === 2 || sNum === 4){
+              demoOut(xhr.response, xhr)
           }else{
-              demoOut({'error': 'Unexpected response: '+xhr.status})
+              demoOut({'error': 'Unexpected response: '+xhr.status}, xhr)
           }
       }
       xhr.onerror = function() {
-          demoOut({'error': xhr.responseText || 'Error completing the request.'})
+          demoOut({'error': xhr.responseText || 'Error completing the request.'}, xhr)
       }
 
       xhr.send();

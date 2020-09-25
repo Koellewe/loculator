@@ -28,51 +28,23 @@ class ApiController < ApplicationController
 
   private def loc_impl
     # todo rate limiting
-    # todo implement request accepting and async checking
-    # immediately return HTTP_ACCEPTED and a null cache
-    # next request same
-    # then when done next request will return HTTP_OK with cache
-    # require that private repos also send latest commit hash
 
     json_cache = init_cache
     if json_cache
       @results = JSON.parse(json_cache)
-      render 'api/loc.json', status: 200
-      return
     end
 
-    tag = Rails.env == 'production' ? 'stable' : 'unstable'
-    ssh_path = Rails.application.config.cfg['ssh_key_path']
+    cache_record = LocCache.find_by(vcs_url: @vcs_url)
 
-    Docker.options[:read_timeout] = 300 # 5 mins
-
-    # res = `docker run -e "VCS_URL=#{vcs_url}" -v "#{config.cfg['ssh_key_path']}:/mnt/creds" koellewe/loculator:#{tag}`
-    counter = Docker::Container.create('Image' => "koellewe/loculator:#{tag}",
-                                       'Env' => ["VCS_URL=#{@vcs_url}"],
-                                       'HostConfig' => { 'Binds' => ["#{ssh_path}:/mnt/creds"] }
-    )
-
-    res = counter.tap(&:start).attach(stdin: nil)
-
-    begin
-      txt = res[0][0]
-      counting_output = if txt.nil?
-        { 'error': 'Could not parse response from container' }
-      else
-        JSON.parse(txt)
-      end
-
-      if counting_output['error']
-        @error = counting_output['error']
-      else
-        @results = counting_output
-        finalise_cache
-      end
-    rescue JSON::ParserError
-      @error = 'Unknown runtime error occurred during line-counting.'
+    if @cache_hit
+      render 'api/loc.json', status: cache_record['running'] ? 202 : 200
+    else
+      # queue counting job
+      LocJob.perform_later @vcs_url, @sha
+      cache_record['running'] = true
+      cache_record.save!
+      render 'api/loc.json', status: 202
     end
-
-    render 'api/loc.json', status: @error ? 400 : 200
   end
 
   # Do all kinds of cache checks
@@ -95,37 +67,28 @@ class ApiController < ApplicationController
           @sha = JSON.parse(res)[0]['id']
         end
       rescue JSON::ParserError, NoMethodError, Net::OpenTimeout, Net::TimeOutError
-        return # either 404 or flaky VCS API
+        @cache_hit = false
+        return nil # either 404 or flaky VCS API
       end
-      return unless @sha
     end
 
     row = LocCache.find_by(vcs_url: @vcs_url)
     if row
       lc = row['latest_commit']
-      if lc == @sha
-        row['json_cache']
+      jcache = row['json_cache']
+      if row['running']
+        @cache_hit = true
+        jcache
       else
-        @cache_op = :update
-        nil # blank return means cache miss
+        @cache_hit = !@sha ? true : lc == @sha # true if private and no sha provided
+        jcache
       end
     else
-      @cache_op = :create
+      LocCache.create(vcs_url: @vcs_url, latest_commit: @sha, json_cache: nil)
+      @cache_hit = false
       nil
     end
 
-  end
-
-  # do the actual caching, if necessary
-  private def finalise_cache
-    if @cache_op == :update
-      cache = LocCache.find_by(vcs_url: @vcs_url)
-      cache['latest_commit'] = @sha
-      cache['json_cache'] = @results.to_json
-      cache.save!
-    elsif @cache_op == :create
-      LocCache.create(vcs_url: @vcs_url, latest_commit: @sha, json_cache: @results.to_json)
-    end
   end
 
   # get the VCS provider, owner, and repo from a url. Note only works for the big boy providers
