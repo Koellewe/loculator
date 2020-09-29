@@ -49,7 +49,7 @@ class LocJob < ApplicationJob
     # created during initial cache check
     cache = LocCache.find_by(vcs_url: @vcs_url)
     cache['latest_commit'] = @sha # will be nil for private non-specified
-    cache['json_cache'] = @error ? @error.to_json : @results.to_json
+    cache['json_cache'] = @error ? { 'error': @error }.to_json : @results.to_json
     cache.save!
   end
 
