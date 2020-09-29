@@ -38,7 +38,8 @@
 
   <p>Calls to the same endpoint after receiving status 202 will instantly return the same results, so long as
   the counting job is running (or queued). Exponential backoff is recommended for checking if counting is complete.
-  A 200 response means the data is the latest.</p>
+  A 200 response means the data is the latest.
+  </p>
 
   <h3>Private projects</h3>
 
@@ -59,7 +60,10 @@
     <span class="url-param unspace">private=true</span>
   </code>
 
-  <p>Note that there's no auto caching for private repo's</p>
+  <p>Note that there's no auto caching for private repos because this requires API access, and that's just too
+  much additional complexity to a project this size. Instead, always specify the latest commit hash when requesting
+    for a private repo. If omitted, only the cache will be returned.
+  </p>
 
 </div>
 

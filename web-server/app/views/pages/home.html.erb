@@ -70,7 +70,6 @@
       const xhr = new XMLHttpRequest();
       xhr.open('GET', url);
       xhr.responseType = 'json';
-      xhr.timeout = 300 * 1000; // 5 mins
       xhr.onload = function() {
           const sNum = Math.floor(xhr.status / 100)
           if (sNum === 2 || sNum === 4){
